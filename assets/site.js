@@ -1,73 +1,96 @@
 const navItems = [
-  ["Home", "index.html"],
-  ["Products", "products.html"],
-  ["Solutions", "solutions.html"],
-  ["About", "about.html"],
-  ["Contact", "contact.html"]
+  ["Home","index.html"],
+  ["Products","products.html"],
+  ["Solutions","solutions.html"],
+  ["About","about.html"],
+  ["Contact","contact.html"]
 ];
 
-document.addEventListener("DOMContentLoaded", () => {
-  const path = window.location.pathname.split("/").pop() || "index.html";
-  const active = path === "" ? "index.html" : path;
+function currentPage() {
+  const file = location.pathname.split("/").pop() || "index.html";
+  return file === "" ? "index.html" : file;
+}
 
-  const header = document.getElementById("site-header");
-  if (header) {
-    header.innerHTML = `
-      <header class="site-header">
-        <div class="container nav-wrap">
-          <a class="logo" href="index.html" aria-label="aanaanaa home">aanaanaa<span>.</span></a>
-          <button class="menu-toggle" aria-label="Open navigation" aria-expanded="false"><span></span><span></span></button>
-          <nav class="nav">
-            ${navItems.map(([name, href]) => `<a class="${active === href ? "active" : ""}" href="${href}">${name}</a>`).join("")}
-          </nav>
-          <a class="nav-cta" href="products.html">Explore Products <span>↗</span></a>
-        </div>
-      </header>`;
-    const toggle = header.querySelector(".menu-toggle");
-    toggle.addEventListener("click", () => {
-      const open = header.classList.toggle("menu-open");
-      toggle.setAttribute("aria-expanded", String(open));
-    });
-  }
+document.getElementById("site-header").innerHTML = `
+<header class="site-header" id="site-header-inner">
+  <div class="nav-wrap">
+    <a class="logo" href="index.html" aria-label="aanaanaa home">aanaanaa</a>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav">
+      <span></span><span></span>
+    </button>
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      ${navItems.map(([label,href]) => `<a href="${href}" class="${currentPage()===href ? "active" : ""}">${label}</a>`).join("")}
+    </nav>
+    <a class="nav-cta" href="products.html">Explore Products <span>↗</span></a>
+  </div>
+  <div class="mobile-nav" id="mobile-nav">
+    ${navItems.map(([label,href]) => `<a href="${href}" class="${currentPage()===href ? "active" : ""}">${label}</a>`).join("")}
+    <a class="mobile-cta" href="products.html">Explore Products <span>↗</span></a>
+  </div>
+</header>`;
 
-  const footer = document.getElementById("site-footer");
-  if (footer) {
-    footer.innerHTML = `
-      <footer class="site-footer">
-        <div class="container footer-top">
-          <div><a class="logo logo-light" href="index.html">aanaanaa<span>.</span></a><p>Technology Infrastructure<br>for the AI Era.</p></div>
-          <div class="footer-links">
-            <div><small>EXPLORE</small>${navItems.map(([name, href]) => `<a href="${href}">${name}</a>`).join("")}</div>
-            <div><small>FOCUS</small><a href="products.html#ai-computing">AI Computing</a><a href="products.html#data-storage">Data Storage</a><a href="products.html#energy">Energy Technology</a></div>
-          </div>
-        </div>
-        <div class="container footer-bottom"><span>© 2026 aanaanaa. All rights reserved.</span><span>Technology Infrastructure for the AI Era</span></div>
-      </footer>`;
-  }
+document.getElementById("site-footer").innerHTML = `
+<footer class="site-footer">
+  <div class="container footer-top">
+    <div><a class="logo footer-logo" href="index.html">aanaanaa</a><p>Technology Infrastructure for the AI Era</p></div>
+    <div class="footer-links">
+      ${navItems.map(([label,href]) => `<a href="${href}">${label}</a>`).join("")}
+    </div>
+  </div>
+  <div class="container footer-bottom"><span>© 2026 aanaanaa. All rights reserved.</span><span>U.S.-based technology e-commerce</span></div>
+</footer>`;
 
-  document.querySelectorAll(".reveal").forEach(el => {
-    requestAnimationFrame(() => el.classList.add("visible"));
-  });
+const header = document.getElementById("site-header-inner");
+const toggle = document.querySelector(".menu-toggle");
+const mobileNav = document.getElementById("mobile-nav");
 
-  const form = document.getElementById("contact-form");
-  if (form) {
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      let valid = true;
-      form.querySelectorAll("[required]").forEach(input => {
-        const ok = input.type === "email" ? /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(input.value.trim()) : input.value.trim().length > 0;
-        input.classList.toggle("invalid", !ok);
-        if (!ok) valid = false;
-      });
-      const status = form.querySelector(".form-status");
-      if (!valid) {
-        status.textContent = "Please check the required fields.";
-        status.className = "form-status error";
-        return;
-      }
-      status.textContent = "Thank you. Your message has been prepared successfully. The form is currently front-end only and does not transmit data until a backend is connected.";
-      status.className = "form-status success";
-      form.reset();
-    });
-  }
+function updateHeader() {
+  header.classList.toggle("scrolled", window.scrollY > 12);
+}
+window.addEventListener("scroll", updateHeader, {passive:true});
+updateHeader();
+
+toggle?.addEventListener("click", () => {
+  const open = toggle.getAttribute("aria-expanded") === "true";
+  toggle.setAttribute("aria-expanded", String(!open));
+  mobileNav.classList.toggle("open", !open);
 });
+mobileNav?.querySelectorAll("a").forEach(a => a.addEventListener("click", () => {
+  toggle.setAttribute("aria-expanded", "false");
+  mobileNav.classList.remove("open");
+}));
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    }
+  });
+}, {threshold:0.08});
+document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
+
+const form = document.getElementById("contact-form");
+if (form) {
+  form.addEventListener("submit", e => {
+    e.preventDefault();
+    const fields = [...form.querySelectorAll("input, textarea")];
+    let valid = true;
+    fields.forEach(field => {
+      const wrapper = field.closest("label");
+      const bad = field.required && !field.value.trim() || field.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(field.value.trim());
+      wrapper?.classList.toggle("invalid", bad);
+      if (bad) valid = false;
+    });
+    const status = form.querySelector(".form-status");
+    if (!valid) {
+      status.textContent = "Please check the highlighted fields.";
+      status.className = "form-status error";
+      return;
+    }
+    status.textContent = "Thanks — your message is ready to be received. The inquiry form is currently in preview mode and does not transmit data yet.";
+    status.className = "form-status success";
+    form.reset();
+  });
+  form.querySelectorAll("input, textarea").forEach(field => field.addEventListener("input", () => field.closest("label")?.classList.remove("invalid")));
+}

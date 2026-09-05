@@ -1,7 +1,7 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "aanaanaa",
-  "compatibility_date": "2026-09-03",
+  "$schema": "https://developers.cloudflare.com/workers/wrangler/config-schema.json",
+  "name": "aanaanaa-website",
+  "compatibility_date": "2026-09-04",
   "assets": {
     "directory": "."
   }

@@ -1,37 +1,28 @@
-# aanaanaa website
+# aanaanaa Website v2
 
-A lightweight, dependency-free, responsive brand website for aanaanaa.
+A lightweight, dependency-free static brand website for aanaanaa.
 
-## Pages
+## What changed in v2
 
-- Home
-- Products
-- Solutions
-- About
-- Contact
+- Reworked visual system with a more premium U.S. technology-company feel.
+- Replaced blank/placeholder image areas with responsive CSS-built product and infrastructure visuals.
+- Kept the site dependency-light: plain HTML, CSS, and JavaScript.
+- Kept all company/product claims conservative and aligned with the supplied brief.
+- No fabricated address, phone, email, social account, customer, partner, certification, model number, price, or performance claim.
+- Contact form remains preview-only and does not transmit/store submissions.
+- No `_redirects` file, avoiding the previous Cloudflare Workers infinite-loop configuration issue.
+- Includes `wrangler.jsonc` for the existing Cloudflare Worker named `aanaanaa-website`.
 
-## Important
+## Deploy
 
-The contact form currently performs front-end validation and shows a success message. It does **not** send or store messages yet, matching the project requirement that database integration is deferred.
+The existing Worker can deploy the repository as static assets. Cloudflare currently supports static assets on Workers, and static asset requests are free/unlimited on the Workers plans; the current Free plan has a 100,000/day request limit for requests that invoke the Worker script. See the official Cloudflare docs for current limits.
 
-No physical address, phone number, email address, customer logos, partner claims, product model numbers, pricing, certifications, or performance claims are fabricated.
+For the current GitHub + Cloudflare setup, commit the contents of this folder to the existing `YaqoobCN/aanaanaa-website` repository and let the connected build deploy it.
 
-## Deploy to Cloudflare Pages
+The project is intentionally self-contained. There is no React/Vite/Supabase dependency in v2.
 
-This version is intentionally static, so you do not need Node.js, React, Vite, Supabase, or any paid website builder.
+## Domain
 
-1. Upload this folder to a GitHub repository.
-2. In Cloudflare Pages, connect the repository.
-3. Select **No framework** / static site if prompted.
-4. Build command: leave empty.
-5. Output directory: `/` (the repository root).
-6. Add your custom domain in Cloudflare Pages.
-7. If the domain is managed by Alibaba Cloud DNS, you can either:
-   - move DNS management to Cloudflare for the simplest apex-domain setup, or
-   - use a CNAME for a subdomain such as `www` if you prefer to keep DNS elsewhere.
+Once the Worker is deployed, use Cloudflare Workers > aanaanaa-website > Settings > Domains & Routes > Add > Custom Domain and add `aanaanaa.com`.
 
-The `_redirects` file keeps the site compatible with SPA-style fallback hosting.
-
-## Before launch
-
-Replace the placeholder contact behavior with a real form backend once the official business email / inquiry workflow is ready.
+Do not delete the existing mail-related DNS records for aanaanaa.com.
